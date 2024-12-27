@@ -13,8 +13,8 @@ st.markdown("""
 Shown are the Stock Price of the selected stock.
 
 **Credits**
--App Built By Tanuj Jain
--Built in `Python` using `Streamlit`,`cufflinks`,`pandas`,`datetime` and `yfinance` libraries.
+-App Built By Tanuj Jain \n
+-Built in `Python` using `Streamlit`,`cufflinks`,`pandas`,`datetime`,`plotly` and `yfinance` libraries.
 """)
 
 st.write("--------")
@@ -24,9 +24,16 @@ start_date=st.sidebar.date_input("Start Date",datetime.date(2019,1,1))
 end_date=st.sidebar.date_input("End Date",datetime.date(2024,12,1))
 
 #Getting Ticker Data
-ticker_list=pd.read_csv('stocks.txt')
-ticker_Symbol=st.sidebar.selectbox("Stock Ticker",ticker_list)
-tickerData=yf.Ticker(ticker_Symbol)
+ticker_list=pd.read_csv('NSE.csv')
+tickerlist2=pd.read_csv('stocks.txt')
+Market=st.sidebar.selectbox("Select Market",["NSE","NASDAQ"])
+if Market=="NSE":
+    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list['SYMBOL'])
+    tickerData=yf.Ticker(f"{ticker_Symbol}.NS")
+else:
+    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",tickerlist2)
+    tickerData=yf.Ticker(f"{ticker_Symbol}")
+
 tickerDf=tickerData.history(period="1d",start=start_date,end=end_date)
 
 #Ticker Information
@@ -85,7 +92,19 @@ if ticker_Symbol:
 
         #Chart Layout
         fig.update_layout(
+            dragmode="zoom",
+            xaxis=dict(
+            rangeslider=dict(visible=True),  # Enable the range slider for scrolling
+            type="date"),
+            yaxis=dict(
+            fixedrange=False  ),
             title=f'{ticker_Symbol} Stock Price and Volume',
+            legend=dict(
+            orientation="h",  # Horizontal orientation
+            yanchor="top",
+            y=-0.2,  # Move legend below the chart
+            xanchor="center",
+            x=0.5),
             xaxis_title='Date',
             yaxis_title='Price (USD)',
             xaxis_rangeslider_visible=False,  
@@ -115,8 +134,21 @@ if not tickerDf.empty:
     go.Scatter(x=tickerDf.index, y=tickerDf['Lower_Band'], mode='lines', name='Lower Bollinger Band'),
     go.Scatter(x=tickerDf.index, y=tickerDf[f'{MA}_MA'], mode='lines', name=f'{MA} Day Moving Average')
 ])
-    fig2.update_layout(title=f"{ticker_Symbol} Bollinger Band",xaxis_title="Date",yaxis_title="Price",xaxis_rangeslider_visible=False)
+    fig2.update_layout(title=f"{ticker_Symbol} Bollinger Band",
+        dragmode="zoom",
+        xaxis=dict(
+        rangeslider=dict(visible=True),  # Enable the range slider for scrolling
+        type="date"),
+        yaxis=dict(
+        fixedrange=False),
+        legend=dict(
+        orientation="h",  # Horizontal orientation
+        yanchor="top",
+        y=-0.2,  # Move legend below the chart
+        xanchor="center",
+        x=0.5
+    ),xaxis_title="Date",yaxis_title="Price",xaxis_rangeslider_visible=False)
     st.plotly_chart(fig2)
 
-st.write(tickerData.info)
-st.write(tickerDf)
+#st.write(tickerData.info)
+#st.write(tickerDf)
