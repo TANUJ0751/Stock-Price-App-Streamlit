@@ -2,9 +2,10 @@ import streamlit as st
 import pandas as pd
 import yfinance as yf
 import cufflinks as cf
-import datetime
+import datetime 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from joblib import load
 
 
 #app title
@@ -35,6 +36,55 @@ else:
     tickerData=yf.Ticker(f"{ticker_Symbol}")
 
 tickerDf=tickerData.history(period="1d",start=start_date,end=end_date)
+#Prediction
+if Market=="NASDAQ":
+    if st.sidebar.button("Predict Stock"):
+
+        current_date = datetime.datetime.now()
+        stock=ticker_Symbol
+        model_dir=f"./models/{stock}/"
+        # Load saved model and scaler
+        scaler1 = load(f'{model_dir}{stock}_scaler.joblib')
+        model1 = load(f'{model_dir}{stock}_predictor.joblib')
+        data=yf.Ticker(stock)
+        SmaEma=data.history(period="2y")
+        data=data.info
+        open_close=data['open']-data['currentPrice']
+        high_low=data['dayHigh']-data['dayLow']
+        volume=data['volume']
+        quarter_end= 1 if current_date.month % 3 == 0 else 0
+        current_date=datetime.datetime.today().date()
+        today_data = pd.DataFrame({
+            'Open': data['open'],
+            'High': data['dayHigh'],
+            'Low': data['dayLow'],
+            'Close': data['currentPrice'],
+            'Volume': data['volume']
+        }, index=[current_date])  # Ensure the index matches `ticker.history`
+
+
+        SmaEma=pd.concat([SmaEma,today_data])
+        print(SmaEma.tail())
+
+        sma10=SmaEma['Close'].rolling(window=10).mean()[-1]
+        sma50=SmaEma['Close'].rolling(window=50).mean()[-1]
+        sma200=SmaEma['Close'].rolling(window=200).mean()[-1]
+        ema10=SmaEma['Close'].ewm(span=10,adjust=False).mean()[-1]
+        ema50=SmaEma['Close'].ewm(span=50,adjust=False).mean()[-1]
+        ema200=SmaEma['Close'].ewm(span=200,adjust=False).mean()[-1]
+        
+        new_data = [[open_close, high_low, volume, quarter_end,sma10,sma50,sma200,ema10,ema50,ema200]]  # Replace with actual feature values
+        new_data_scaled = scaler1.transform(new_data)
+        prediction = model1.predict(new_data_scaled)
+        probability = model1.predict_proba(new_data_scaled)
+        if prediction[0] == 1 :
+            st.sidebar.write("Bullish")
+            st.sidebar.write(f"Probability of Bullish: {round(probability[0][1]*100,2)}%")
+        else:
+            st.sidebar.write("Bearish")
+            st.sidebar.write(f"Probability of Bearish: {round(probability[0][1]*100,2)}%")
+    
+    
 
 #Ticker Information
 stock_name=tickerData.info['longName']
@@ -150,5 +200,5 @@ if not tickerDf.empty:
     ),xaxis_title="Date",yaxis_title="Price",xaxis_rangeslider_visible=False)
     st.plotly_chart(fig2)
 
-#st.write(tickerData.info)
+st.write(tickerData.info)
 #st.write(tickerDf)
