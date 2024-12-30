@@ -226,5 +226,5 @@ if not tickerDf.empty:
     ),xaxis_title="Date",yaxis_title="Price",xaxis_rangeslider_visible=False)
     st.plotly_chart(fig2)
 
-st.write(tickerData.info)
+#st.write(tickerData.info)
 #st.write(tickerDf)
