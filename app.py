@@ -26,7 +26,7 @@ end_date=st.sidebar.date_input("End Date",datetime.date(2024,12,1))
 
 #Getting Ticker Data
 ticker_list=pd.read_csv('NSE.csv')
-tickerlist2=pd.read_csv('stocks.txt')
+tickerlist2=pd.read_csv('nasdaq-listed.csv')
 Market=st.sidebar.selectbox("Select Market",["NSE","NASDAQ"])
 if Market=="NSE":
     ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list['SYMBOL'])
