@@ -53,7 +53,7 @@ if st.sidebar.button("Predict Stock"):
     
     Yf_data=yf.Ticker(stock)
     SmaEma=tickerData.history(period="max")
-    st.sidebar.write(SmaEma.head())
+    
     open_close=data['open']-data['currentPrice']
     high_low=data['dayHigh']-data['dayLow']
     volume=data['volume']
@@ -80,15 +80,17 @@ if st.sidebar.button("Predict Stock"):
     print(open_close, high_low, volume, quarter_end,sma10,sma50,sma200,ema10,ema50,ema200)
     new_data = [[open_close, high_low, volume, quarter_end,sma10,sma50,sma200,ema10,ema50,ema200]]  # Replace with actual feature values
     new_data_scaled = scaler1.transform(new_data)
-    st.sidebar.write(pd.DataFrame(new_data_scaled).isnull().sum())
+    
     prediction = model1.predict(new_data_scaled)
     probability = model1.predict_proba(new_data_scaled)
     if prediction[0] == 1 :
-        st.sidebar.write("Bullish")
-        st.sidebar.write(f"Probability of Bullish: {round(probability[0][1]*100,2)}%")
+        color="green"
+        st.sidebar.markdown(f"<h2 style='color:{color}'>Bullish<br>Probability of Bullish: {round(probability[0][1]*100,2)}%</h2>",unsafe_allow_html=True)
+        
     else:
-        st.sidebar.write("Bearish")
-        st.sidebar.write(f"Probability of Bearish: {round(probability[0][1]*100,2)}%")
+        color='red'
+        st.sidebar.markdown(f"<h2 style='color:{color}'>Bearish<br> Probability of Bearish: {round(probability[0][1]*100,2)}%</h3>",unsafe_allow_html=True)
+        
 
     
 
