@@ -26,11 +26,22 @@ end_date=st.sidebar.date_input("End Date",datetime.date(2024,12,1))
 
 #Getting Ticker Data
 ticker_list=pd.read_csv('NSE.csv')
+crypto_list=pd.read_csv('crypto_data.csv')
+ticker_list_LSE=pd.read_csv('LSE.csv')
 tickerlist2=pd.read_csv('nasdaq-listed.csv')
-Market=st.sidebar.selectbox("Select Market",["NSE","NASDAQ"])
+Market=st.sidebar.selectbox("Select Market",["NSE","NASDAQ","LSE","CRYPTO"])
 if Market=="NSE":
     ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list['SYMBOL'])
     tickerData=yf.Ticker(f"{ticker_Symbol}.NS")
+elif Market=="LSE":
+    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list_LSE['Symbol'])
+    tickerData=yf.Ticker(f"{ticker_Symbol}.L")
+elif Market=="CRYPTO":
+    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list_LSE['Symbol'])
+    tickerData=yf.Ticker(f"{ticker_Symbol}.L")
+    #ticker_Symbol=st.sidebar.selectbox("Stock Symbol",crypto_list["CODE"])
+
+    #tickerData=yf.Ticker(f"{ticker_Symbol}-USD")
 else:
     ticker_Symbol=st.sidebar.selectbox("Stock Symbol",tickerlist2)
     tickerData=yf.Ticker(f"{ticker_Symbol}")
@@ -38,59 +49,60 @@ else:
 tickerDf=tickerData.history(period="1d",start=start_date,end=end_date)
 #Prediction
 data=tickerData.info
-if st.sidebar.button("Predict Stock"):
-    stock=ticker_Symbol
-    if Market=="NASDAQ":
-        model_dir=f"./models/{stock}/"
-        scaler1 = load(f'{model_dir}{stock}_scaler.joblib')
-        model1 = load(f'{model_dir}{stock}_predictor.joblib')
-    else:
-        model_dir=f"./modelsNS/{stock}.NS/"
-        scaler1 = load(f'{model_dir}{stock}.NS_scaler.joblib')
-        model1 = load(f'{model_dir}{stock}.NS_predictor.joblib')
-    current_date = datetime.datetime.now()
-    # Load saved model and scaler
-    
-    Yf_data=yf.Ticker(stock)
-    SmaEma=tickerData.history(period="max")
-    
-    open_close=data['open']-data['currentPrice']
-    high_low=data['dayHigh']-data['dayLow']
-    volume=data['volume']
-    quarter_end= 1 if current_date.month % 3 == 0 else 0
-    current_date=datetime.datetime.today().date()
-    today_data = pd.DataFrame({
-        'Open': data['open'],
-        'High': data['dayHigh'],
-        'Low': data['dayLow'],
-        'Close': data['currentPrice'],
-        'Volume': data['volume']
-    }, index=[current_date])  # Ensure the index matches `ticker.history`
-
-
-    SmaEma=pd.concat([SmaEma,today_data])
-    # st.sidebar.write(SmaEma.tail())
-
-    sma10=SmaEma['Close'].rolling(window=10).mean()[-1]
-    sma50=SmaEma['Close'].rolling(window=50).mean()[-1]
-    sma200=SmaEma['Close'].rolling(window=200).mean()[-1]
-    ema10=SmaEma['Close'].ewm(span=10,adjust=False).mean()[-1]
-    ema50=SmaEma['Close'].ewm(span=50,adjust=False).mean()[-1]
-    ema200=SmaEma['Close'].ewm(span=200,adjust=False).mean()[-1]
-    print(open_close, high_low, volume, quarter_end,sma10,sma50,sma200,ema10,ema50,ema200)
-    new_data = [[open_close, high_low, volume, quarter_end,sma10,sma50,sma200,ema10,ema50,ema200]]  # Replace with actual feature values
-    new_data_scaled = scaler1.transform(new_data)
-    
-    prediction = model1.predict(new_data_scaled)
-    probability = model1.predict_proba(new_data_scaled)
-    if prediction[0] == 1 :
-        color="green"
-        st.sidebar.markdown(f"<h2 style='color:{color}'>Bullish<br>Probability of Bullish: {round(probability[0][1]*100,2)}%</h2>",unsafe_allow_html=True)
+if Market==["NSE","NASDAQ"]:
+    if st.sidebar.button("Predict Stock"):
+        stock=ticker_Symbol
+        if Market=="NASDAQ":
+            model_dir=f"./models/{stock}/"
+            scaler1 = load(f'{model_dir}{stock}_scaler.joblib')
+            model1 = load(f'{model_dir}{stock}_predictor.joblib')
+        else:
+            model_dir=f"./modelsNS/{stock}.NS/"
+            scaler1 = load(f'{model_dir}{stock}.NS_scaler.joblib')
+            model1 = load(f'{model_dir}{stock}.NS_predictor.joblib')
+        current_date = datetime.datetime.now()
+        # Load saved model and scaler
         
-    else:
-        color='red'
-        st.sidebar.markdown(f"<h2 style='color:{color}'>Bearish<br> Probability of Bearish: {round(probability[0][1]*100,2)}%</h3>",unsafe_allow_html=True)
+        Yf_data=yf.Ticker(stock)
+        SmaEma=tickerData.history(period="max")
         
+        open_close=data['open']-data['currentPrice']
+        high_low=data['dayHigh']-data['dayLow']
+        volume=data['volume']
+        quarter_end= 1 if current_date.month % 3 == 0 else 0
+        current_date=datetime.datetime.today().date()
+        today_data = pd.DataFrame({
+            'Open': data['open'],
+            'High': data['dayHigh'],
+            'Low': data['dayLow'],
+            'Close': data['currentPrice'],
+            'Volume': data['volume']
+        }, index=[current_date])  # Ensure the index matches `ticker.history`
+
+
+        SmaEma=pd.concat([SmaEma,today_data])
+        # st.sidebar.write(SmaEma.tail())
+
+        sma10=SmaEma['Close'].rolling(window=10).mean()[-1]
+        sma50=SmaEma['Close'].rolling(window=50).mean()[-1]
+        sma200=SmaEma['Close'].rolling(window=200).mean()[-1]
+        ema10=SmaEma['Close'].ewm(span=10,adjust=False).mean()[-1]
+        ema50=SmaEma['Close'].ewm(span=50,adjust=False).mean()[-1]
+        ema200=SmaEma['Close'].ewm(span=200,adjust=False).mean()[-1]
+        print(open_close, high_low, volume, quarter_end,sma10,sma50,sma200,ema10,ema50,ema200)
+        new_data = [[open_close, high_low, volume, quarter_end,sma10,sma50,sma200,ema10,ema50,ema200]]  # Replace with actual feature values
+        new_data_scaled = scaler1.transform(new_data)
+        
+        prediction = model1.predict(new_data_scaled)
+        probability = model1.predict_proba(new_data_scaled)
+        if prediction[0] == 1 :
+            color="green"
+            st.sidebar.markdown(f"<h2 style='color:{color}'>Bullish<br>Probability of Bullish: {round(probability[0][1]*100,2)}%</h2>",unsafe_allow_html=True)
+            
+        else:
+            color='red'
+            st.sidebar.markdown(f"<h2 style='color:{color}'>Bearish<br> Probability of Bearish: {round(probability[0][1]*100,2)}%</h3>",unsafe_allow_html=True)
+            
 
     
 
@@ -117,8 +129,14 @@ logo_url = f"https://logo.clearbit.com/{domain}"
 st.image(logo_url)
 
 st.write(f"**Sector :** {tickerData.info['sector']}")
-stock_summary=tickerData.info['longBusinessSummary']
-st.write(stock_summary)
+if st.pills("",options="View Long Summary"):
+    st.write(tickerData.info['longBusinessSummary'])
+st.write("Fundamentals :")
+st.write(f"**Market Cap :** {tickerData.info['marketCap']} {tickerData.info['currency']}")
+st.write(f"**Enterprise Value :** {tickerData.info['enterpriseValue']} {tickerData.info['currency']}")
+st.write(f"**Float Shares :** {tickerData.info['floatShares']}")
+
+
 periods=['1d','5d','1mo','2mo']
 #candlestick Chart 
 if ticker_Symbol:
@@ -208,5 +226,5 @@ if not tickerDf.empty:
     ),xaxis_title="Date",yaxis_title="Price",xaxis_rangeslider_visible=False)
     st.plotly_chart(fig2)
 
-#st.write(tickerData.info)
+st.write(tickerData.info)
 #st.write(tickerDf)
