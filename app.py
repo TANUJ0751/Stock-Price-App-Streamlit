@@ -37,7 +37,7 @@ else:
 
 tickerDf=tickerData.history(period="1d",start=start_date,end=end_date)
 #Prediction
-
+data=tickerData.info
 if st.sidebar.button("Predict Stock"):
     stock=ticker_Symbol
     if Market=="NASDAQ":
@@ -51,9 +51,9 @@ if st.sidebar.button("Predict Stock"):
     current_date = datetime.datetime.now()
     # Load saved model and scaler
     
-    data=yf.Ticker(stock)
-    SmaEma=data.history(period="2y")
-    data=data.info
+    Yf_data=yf.Ticker(stock)
+    SmaEma=tickerData.history(period="max")
+    st.sidebar.write(SmaEma.head())
     open_close=data['open']-data['currentPrice']
     high_low=data['dayHigh']-data['dayLow']
     volume=data['volume']
@@ -69,7 +69,7 @@ if st.sidebar.button("Predict Stock"):
 
 
     SmaEma=pd.concat([SmaEma,today_data])
-    print(SmaEma.tail())
+    # st.sidebar.write(SmaEma.tail())
 
     sma10=SmaEma['Close'].rolling(window=10).mean()[-1]
     sma50=SmaEma['Close'].rolling(window=50).mean()[-1]
@@ -77,9 +77,10 @@ if st.sidebar.button("Predict Stock"):
     ema10=SmaEma['Close'].ewm(span=10,adjust=False).mean()[-1]
     ema50=SmaEma['Close'].ewm(span=50,adjust=False).mean()[-1]
     ema200=SmaEma['Close'].ewm(span=200,adjust=False).mean()[-1]
-    
+    print(open_close, high_low, volume, quarter_end,sma10,sma50,sma200,ema10,ema50,ema200)
     new_data = [[open_close, high_low, volume, quarter_end,sma10,sma50,sma200,ema10,ema50,ema200]]  # Replace with actual feature values
     new_data_scaled = scaler1.transform(new_data)
+    st.sidebar.write(pd.DataFrame(new_data_scaled).isnull().sum())
     prediction = model1.predict(new_data_scaled)
     probability = model1.predict_proba(new_data_scaled)
     if prediction[0] == 1 :
