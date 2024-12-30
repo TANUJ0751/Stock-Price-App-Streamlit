@@ -49,7 +49,7 @@ else:
 tickerDf=tickerData.history(period="1d",start=start_date,end=end_date)
 #Prediction
 data=tickerData.info
-if Market==["NSE","NASDAQ"]:
+if Market=="NSE" or Market=="NASDAQ":
     if st.sidebar.button("Predict Stock"):
         stock=ticker_Symbol
         if Market=="NASDAQ":
