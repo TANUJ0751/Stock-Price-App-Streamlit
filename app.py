@@ -26,19 +26,17 @@ end_date=st.sidebar.date_input("End Date",datetime.date(2024,12,1))
 
 #Getting Ticker Data
 ticker_list=pd.read_csv('NSE.csv')
-crypto_list=pd.read_csv('crypto_data.csv')
+
 ticker_list_LSE=pd.read_csv('LSE.csv')
 tickerlist2=pd.read_csv('nasdaq-listed.csv')
-Market=st.sidebar.selectbox("Select Market",["NSE","NASDAQ","LSE","CRYPTO"])
+Market=st.sidebar.selectbox("Select Market",["NSE","NASDAQ","LSE"])
 if Market=="NSE":
     ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list['SYMBOL'])
     tickerData=yf.Ticker(f"{ticker_Symbol}.NS")
 elif Market=="LSE":
     ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list_LSE['Symbol'])
     tickerData=yf.Ticker(f"{ticker_Symbol}.L")
-elif Market=="CRYPTO":
-    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list_LSE['Symbol'])
-    tickerData=yf.Ticker(f"{ticker_Symbol}.L")
+
     #ticker_Symbol=st.sidebar.selectbox("Stock Symbol",crypto_list["CODE"])
 
     #tickerData=yf.Ticker(f"{ticker_Symbol}-USD")
