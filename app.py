@@ -26,7 +26,6 @@ end_date=st.sidebar.date_input("End Date",datetime.date(2024,12,1))
 
 #Getting Ticker Data
 ticker_list=pd.read_csv('NSE.csv')
-
 ticker_list_LSE=pd.read_csv('LSE.csv')
 tickerlist2=pd.read_csv('nasdaq-listed.csv')
 Market=st.sidebar.selectbox("Select Market",["NSE","NASDAQ","LSE"])
