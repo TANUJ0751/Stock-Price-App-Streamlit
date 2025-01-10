@@ -103,7 +103,7 @@ if Market=="NSE" or Market=="NASDAQ":
             
 
     
-while True:
+while ticker_Symbol:
     tickerData=yf.Ticker(f"{ticker_Symbol}")
     #Ticker Information
     stock_name=tickerData.info['longName']
