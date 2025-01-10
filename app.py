@@ -29,19 +29,19 @@ end_date=st.sidebar.date_input("End Date",datetime.date(2024,12,1))
 ticker_list=pd.read_csv('NSE.csv')
 ticker_list_LSE=pd.read_csv('LSE.csv')
 tickerlist2=pd.read_csv('nasdaq-listed.csv')
-Market=st.sidebar.selectbox("Select Market",["NSE","NASDAQ","LSE"],label_visibility="collapsed")
+Market=st.sidebar.selectbox("Select Market",["NSE","NASDAQ","LSE"])
 if Market=="NSE":
-    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list['SYMBOL'],label_visibility="collapsed")
+    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list['SYMBOL'])
     ticker_Symbol=ticker_Symbol+".NS"
 elif Market=="LSE":
-    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list_LSE['Symbol'],label_visibility="collapsed")
+    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list_LSE['Symbol'])
     ticker_Symbol=ticker_Symbol+".L"
 
     #ticker_Symbol=st.sidebar.selectbox("Stock Symbol",crypto_list["CODE"])
 
     #tickerData=yf.Ticker(f"{ticker_Symbol}-USD")
 else:
-    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",tickerlist2,label_visibility="collapsed")
+    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",tickerlist2)
     
 tickerData=yf.Ticker(f"{ticker_Symbol}")
 tickerDf=tickerData.history(period="1d",start=start_date,end=end_date)
