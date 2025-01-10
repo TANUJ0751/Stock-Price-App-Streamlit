@@ -6,6 +6,7 @@ import datetime
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from joblib import load
+import time
 
 
 #app title
@@ -223,6 +224,6 @@ while True:
             x=0.5
         ),xaxis_title="Date",yaxis_title="Price",xaxis_rangeslider_visible=False)
         st.plotly_chart(fig2)
-
+    time.sleep(3)
     #st.write(tickerData.info)
     #st.write(tickerDf)
