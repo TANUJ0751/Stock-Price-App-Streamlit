@@ -31,7 +31,7 @@ tickerlist2=pd.read_csv('nasdaq-listed.csv')
 Market=st.sidebar.selectbox("Select Market",["NSE","NASDAQ","LSE"])
 if Market=="NSE":
     ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list['SYMBOL'])
-    tickerData=yf.Ticker(f"{ticker_Symbol}.NS")
+    ticker_Symbol=ticker_Symbol+".NS"
 elif Market=="LSE":
     ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list_LSE['Symbol'])
     tickerData=yf.Ticker(f"{ticker_Symbol}.L")
