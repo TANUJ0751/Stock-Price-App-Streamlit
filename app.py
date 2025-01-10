@@ -118,113 +118,114 @@ while ticker_Symbol:
     else:
         color='grey'
     st.markdown(f"<h2 style='color:{color}'>{tickerData.info['currentPrice']} {tickerData.info['currency']} <h3 style='color:{color}'>{change} {changeper}%</h3></h2>",unsafe_allow_html=True)
+    time.sleep(3)
+    st.experimental_rerun()
 
-    company_website = tickerData.info['website']
+company_website = tickerData.info['website']
 
-    domain = company_website.split("//")[-1].split("/")[0]  # Extract domain
+domain = company_website.split("//")[-1].split("/")[0]  # Extract domain
 
-    logo_url = f"https://logo.clearbit.com/{domain}"
+logo_url = f"https://logo.clearbit.com/{domain}"
 
-    st.image(logo_url)
+st.image(logo_url)
 
-    st.write(f"**Sector :** {tickerData.info['sector']}")
-    if st.pills("",options="View Long Summary"):
-        st.write(tickerData.info['longBusinessSummary'])
-    st.write("Fundamentals :")
-    st.write(f"**Market Cap :** {tickerData.info['marketCap']} {tickerData.info['currency']}")
-    st.write(f"**Enterprise Value :** {tickerData.info['enterpriseValue']} {tickerData.info['currency']}")
-    st.write(f"**Float Shares :** {tickerData.info['floatShares']}")
+st.write(f"**Sector :** {tickerData.info['sector']}")
+if st.pills("",options="View Long Summary"):
+    st.write(tickerData.info['longBusinessSummary'])
+st.write("Fundamentals :")
+st.write(f"**Market Cap :** {tickerData.info['marketCap']} {tickerData.info['currency']}")
+st.write(f"**Enterprise Value :** {tickerData.info['enterpriseValue']} {tickerData.info['currency']}")
+st.write(f"**Float Shares :** {tickerData.info['floatShares']}")
 
 
-    periods=['1d','5d','1mo','2mo']
-    #candlestick Chart 
-    if ticker_Symbol:
-        if not tickerDf.empty:
-            st.write("--------")
-            
-            cperiod=st.selectbox("Select Date range",periods)
-            tickerDf=tickerData.history(period=cperiod,start=start_date,end=end_date)
-            fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
-                        vertical_spacing=0.03, row_heights=[0.7, 0.3],
-                        subplot_titles=['Candlestick Chart', 'Volume Chart'],
-                        row_titles=['', 'Volume'])
-            fig.add_trace(go.Candlestick(
-                            x=tickerDf.index,
-                            open=tickerDf['Open'],
-                            high=tickerDf['High'],
-                            low=tickerDf['Low'],
-                            close=tickerDf['Close'],
-                            name="Candlestick"
-                            ), row=1, col=1)
-            fig.add_trace(
-                    go.Bar(
-                        x=tickerDf.index,
-                        y=tickerDf['Volume'],
-                        name='Volume',
-                        marker_color='rgba(0, 200, 0, 0.5)'  
-                    ),
-                    row=2, col=1  )
-
-            #Chart Layout
-            fig.update_layout(
-                dragmode="zoom",
-                xaxis=dict(
-                rangeslider=dict(visible=True),  # Enable the range slider for scrolling
-                type="date"),
-                yaxis=dict(
-                fixedrange=False  ),
-                title=f'{ticker_Symbol} Stock Price and Volume',
-                legend=dict(
-                orientation="h",  # Horizontal orientation
-                yanchor="top",
-                y=-0.2,  # Move legend below the chart
-                xanchor="center",
-                x=0.5),
-                xaxis_title='Date',
-                yaxis_title='Price (USD)',
-                xaxis_rangeslider_visible=False,  
-                height=600  
-            )
-            #display the chart
-            st.plotly_chart(fig,use_container_width=True)
-    #bollinger band
+periods=['1d','5d','1mo','2mo']
+#candlestick Chart 
+if ticker_Symbol:
     if not tickerDf.empty:
         st.write("--------")
-        bperiod=st.selectbox("Select Date range for Bollinger Bands",periods)
-        MA=st.selectbox("Select DMA For Bollinger Bands",[10,20,30,40,50,60])
-        tickerDf=tickerData.history(period=bperiod,start=start_date,end=end_date)
-        #Moving Average Calculation
-        tickerDf[f'{MA}_MA'] = tickerDf['Close'].rolling(window=MA).mean()
-        tickerDf['Upper_Band'] = tickerDf[f'{MA}_MA'] + 2 * tickerDf['Close'].rolling(window=MA).std()
-        tickerDf['Lower_Band'] = tickerDf[f'{MA}_MA'] - 2 * tickerDf['Close'].rolling(window=MA).std()
-        # Plotting Bollinger Bands
-        fig2 = go.Figure(data=[
-        go.Candlestick(x=tickerDf.index,
-                    open=tickerDf['Open'],
-                    high=tickerDf['High'],
-                    low=tickerDf['Low'],
-                    close=tickerDf['Close'],
-                    name='Candlestick'),
-        go.Scatter(x=tickerDf.index, y=tickerDf['Upper_Band'], mode='lines', name='Upper Bollinger Band'),
-        go.Scatter(x=tickerDf.index, y=tickerDf['Lower_Band'], mode='lines', name='Lower Bollinger Band'),
-        go.Scatter(x=tickerDf.index, y=tickerDf[f'{MA}_MA'], mode='lines', name=f'{MA} Day Moving Average')
-    ])
-        fig2.update_layout(title=f"{ticker_Symbol} Bollinger Band",
+        
+        cperiod=st.selectbox("Select Date range",periods)
+        tickerDf=tickerData.history(period=cperiod,start=start_date,end=end_date)
+        fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
+                    vertical_spacing=0.03, row_heights=[0.7, 0.3],
+                    subplot_titles=['Candlestick Chart', 'Volume Chart'],
+                    row_titles=['', 'Volume'])
+        fig.add_trace(go.Candlestick(
+                        x=tickerDf.index,
+                        open=tickerDf['Open'],
+                        high=tickerDf['High'],
+                        low=tickerDf['Low'],
+                        close=tickerDf['Close'],
+                        name="Candlestick"
+                        ), row=1, col=1)
+        fig.add_trace(
+                go.Bar(
+                    x=tickerDf.index,
+                    y=tickerDf['Volume'],
+                    name='Volume',
+                    marker_color='rgba(0, 200, 0, 0.5)'  
+                ),
+                row=2, col=1  )
+
+        #Chart Layout
+        fig.update_layout(
             dragmode="zoom",
             xaxis=dict(
             rangeslider=dict(visible=True),  # Enable the range slider for scrolling
             type="date"),
             yaxis=dict(
-            fixedrange=False),
+            fixedrange=False  ),
+            title=f'{ticker_Symbol} Stock Price and Volume',
             legend=dict(
             orientation="h",  # Horizontal orientation
             yanchor="top",
             y=-0.2,  # Move legend below the chart
             xanchor="center",
-            x=0.5
-        ),xaxis_title="Date",yaxis_title="Price",xaxis_rangeslider_visible=False)
-        st.plotly_chart(fig2)
-    time.sleep(3)
-    st.experimental_rerun()
-    #st.write(tickerData.info)
-    #st.write(tickerDf)
+            x=0.5),
+            xaxis_title='Date',
+            yaxis_title='Price (USD)',
+            xaxis_rangeslider_visible=False,  
+            height=600  
+        )
+        #display the chart
+        st.plotly_chart(fig,use_container_width=True)
+#bollinger band
+if not tickerDf.empty:
+    st.write("--------")
+    bperiod=st.selectbox("Select Date range for Bollinger Bands",periods)
+    MA=st.selectbox("Select DMA For Bollinger Bands",[10,20,30,40,50,60])
+    tickerDf=tickerData.history(period=bperiod,start=start_date,end=end_date)
+    #Moving Average Calculation
+    tickerDf[f'{MA}_MA'] = tickerDf['Close'].rolling(window=MA).mean()
+    tickerDf['Upper_Band'] = tickerDf[f'{MA}_MA'] + 2 * tickerDf['Close'].rolling(window=MA).std()
+    tickerDf['Lower_Band'] = tickerDf[f'{MA}_MA'] - 2 * tickerDf['Close'].rolling(window=MA).std()
+    # Plotting Bollinger Bands
+    fig2 = go.Figure(data=[
+    go.Candlestick(x=tickerDf.index,
+                open=tickerDf['Open'],
+                high=tickerDf['High'],
+                low=tickerDf['Low'],
+                close=tickerDf['Close'],
+                name='Candlestick'),
+    go.Scatter(x=tickerDf.index, y=tickerDf['Upper_Band'], mode='lines', name='Upper Bollinger Band'),
+    go.Scatter(x=tickerDf.index, y=tickerDf['Lower_Band'], mode='lines', name='Lower Bollinger Band'),
+    go.Scatter(x=tickerDf.index, y=tickerDf[f'{MA}_MA'], mode='lines', name=f'{MA} Day Moving Average')
+])
+    fig2.update_layout(title=f"{ticker_Symbol} Bollinger Band",
+        dragmode="zoom",
+        xaxis=dict(
+        rangeslider=dict(visible=True),  # Enable the range slider for scrolling
+        type="date"),
+        yaxis=dict(
+        fixedrange=False),
+        legend=dict(
+        orientation="h",  # Horizontal orientation
+        yanchor="top",
+        y=-0.2,  # Move legend below the chart
+        xanchor="center",
+        x=0.5
+    ),xaxis_title="Date",yaxis_title="Price",xaxis_rangeslider_visible=False)
+    st.plotly_chart(fig2)
+
+#st.write(tickerData.info)
+#st.write(tickerDf)
