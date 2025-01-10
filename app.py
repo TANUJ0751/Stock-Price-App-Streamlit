@@ -41,8 +41,8 @@ elif Market=="LSE":
     #tickerData=yf.Ticker(f"{ticker_Symbol}-USD")
 else:
     ticker_Symbol=st.sidebar.selectbox("Stock Symbol",tickerlist2)
-    tickerData=yf.Ticker(f"{ticker_Symbol}")
-
+    
+tickerData=yf.Ticker(f"{ticker_Symbol}")
 tickerDf=tickerData.history(period="1d",start=start_date,end=end_date)
 #Prediction
 data=tickerData.info
