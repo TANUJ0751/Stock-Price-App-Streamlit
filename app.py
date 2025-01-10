@@ -226,6 +226,6 @@ if ticker_Symbol:
             ),xaxis_title="Date",yaxis_title="Price",xaxis_rangeslider_visible=False)
             st.plotly_chart(fig2)
         time.sleep(3)
-        st.experimental_rerun()
+        st.rerun()
         #st.write(tickerData.info)
         #st.write(tickerDf)
