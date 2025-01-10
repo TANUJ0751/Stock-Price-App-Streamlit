@@ -29,19 +29,19 @@ end_date=st.sidebar.date_input("End Date",datetime.date(2024,12,1))
 ticker_list=pd.read_csv('NSE.csv')
 ticker_list_LSE=pd.read_csv('LSE.csv')
 tickerlist2=pd.read_csv('nasdaq-listed.csv')
-Market=st.sidebar.selectbox("Select Market",["NSE","NASDAQ","LSE"])
+Market=st.sidebar.selectbox("Select Market",["NSE","NASDAQ","LSE"],label_visibility="collapsed")
 if Market=="NSE":
-    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list['SYMBOL'])
+    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list['SYMBOL'],label_visibility="collapsed")
     ticker_Symbol=ticker_Symbol+".NS"
 elif Market=="LSE":
-    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list_LSE['Symbol'])
+    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list_LSE['Symbol'],label_visibility="collapsed")
     ticker_Symbol=ticker_Symbol+".L"
 
     #ticker_Symbol=st.sidebar.selectbox("Stock Symbol",crypto_list["CODE"])
 
     #tickerData=yf.Ticker(f"{ticker_Symbol}-USD")
 else:
-    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",tickerlist2)
+    ticker_Symbol=st.sidebar.selectbox("Stock Symbol",tickerlist2,label_visibility="collapsed")
     
 tickerData=yf.Ticker(f"{ticker_Symbol}")
 tickerDf=tickerData.history(period="1d",start=start_date,end=end_date)
@@ -103,7 +103,7 @@ if Market=="NSE" or Market=="NASDAQ":
             
 if ticker_Symbol:
 
-    for i in range(10000):
+    while True:
         tickerData=yf.Ticker(f"{ticker_Symbol}")
         #Ticker Information
         stock_name=tickerData.info['longName']
@@ -225,7 +225,7 @@ if ticker_Symbol:
                 x=0.5
             ),xaxis_title="Date",yaxis_title="Price",xaxis_rangeslider_visible=False)
             st.plotly_chart(fig2)
-        time.sleep(3)
+        time.sleep(5)
         st.rerun()
         #st.write(tickerData.info)
         #st.write(tickerDf)
