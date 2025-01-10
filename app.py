@@ -34,7 +34,7 @@ if Market=="NSE":
     ticker_Symbol=ticker_Symbol+".NS"
 elif Market=="LSE":
     ticker_Symbol=st.sidebar.selectbox("Stock Symbol",ticker_list_LSE['Symbol'])
-    tickerData=yf.Ticker(f"{ticker_Symbol}.L")
+    ticker_Symbol=ticker_Symbol+".L"
 
     #ticker_Symbol=st.sidebar.selectbox("Stock Symbol",crypto_list["CODE"])
 
